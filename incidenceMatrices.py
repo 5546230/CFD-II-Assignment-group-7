@@ -14,7 +14,15 @@ def assemble_element_E10(p):
 	## ++++++++++++++ Implement the incidence matrix E10 ++++++++++++ ##
 	## +++++++++++++++++++++++++++ below ++++++++++++++++++++++++++++ ##
 	## ============================================================== ##
-	raise NotImplementedError
+	E10_1d = sp.diags([1, -1], [0, 1], shape=(p, p+1))
+	I = sp.eye(p+1)
+	E10 = sp.block_array(
+		[
+			[sp.kron(-E10_1d, I)], 
+			[sp.kron(I, E10_1d)]
+		]
+	)
+	return E10
 
 def assemble_element_E21(p):
 	""" 
@@ -29,4 +37,11 @@ def assemble_element_E21(p):
 	## ++++++++++++++ Implement the incidence matrix E21 ++++++++++++ ##
 	## +++++++++++++++++++++++++++ below ++++++++++++++++++++++++++++ ##
 	## ============================================================== ##
-	raise NotImplementedError
+	E21_1d = -sp.diags([1, -1], [0, 1], shape=(p, p+1))
+	E21 = sp.block_array(
+		[[
+			sp.kron(sp.eye(p), E21_1d),
+			sp.kron(E21_1d, sp.eye(p))
+		]]
+	)
+	return E21
