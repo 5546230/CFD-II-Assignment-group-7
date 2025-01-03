@@ -79,6 +79,8 @@ if __name__ == '__main__':
 	# Source term of PDE
 	fx = lambda x, y: -(0.25 + 0.25*np.tanh(-15*(y - 0.5)));
 	fy = lambda x, y: np.zeros_like(x);
+	# Save data
+	save_data = False;
 	## ============================================== ##
 	## ============================================== ##
 
@@ -128,8 +130,41 @@ if __name__ == '__main__':
 	ax.set_xlabel(r'$x$');
 	ax.set_ylabel(r'$y$');
 	fig.colorbar(cax, orientation = 'horizontal');
+	fig.tight_layout();
 
 	# Now implement your own plotting routine for the streamlines, the divergence plots, etc
-	plt.show();
+	# plt.show();
 	## ============================================== ##
 	## ============================================== ##
+	y = np.linspace(0, 1, 20, endpoint = True);
+	# find the streamfunc values at (0, y)
+	streamfuncIsoValues = np.zeros_like(y);
+	for i in range(len(y)):
+		idx = np.argmin(np.abs(msh.yPlot[:, 0] - y[i]));
+		streamfuncIsoValues[i] = streamFunc_Reconstruct[idx, 0];
+	uMag = np.sqrt(u_Reconstruct**2 + v_Reconstruct**2);
+	fig2 = plt.figure();
+	ax2 = fig2.add_subplot(111);
+	cax2 = ax2.contourf(msh.xPlot, msh.yPlot, uMag, cmap = 'viridis', extend = 'both', levels = np.linspace(0, 1, 100));
+	ax2.contour(msh.xPlot, msh.yPlot, streamFunc_Reconstruct, levels = streamfuncIsoValues, colors = 'black', linestyles = 'solid', );
+	ax2.set_aspect('equal');
+	ax2.set_xlabel(r'$x$');
+	ax2.set_ylabel(r'$y$');
+	fig2.colorbar(cax2, orientation = 'horizontal');
+	fig2.tight_layout();
+
+	fig3 = plt.figure();
+	ax3 = fig3.add_subplot(111);
+	cax3 = ax3.pcolormesh(msh.xPlot, msh.yPlot, DIVu_Reconstruct, cmap = 'viridis');
+	ax3.set_aspect('equal');
+	ax3.set_xlabel(r'$x$');
+	ax3.set_ylabel(r'$y$');
+	fig3.colorbar(cax3, orientation = 'horizontal');
+	fig3.tight_layout();
+	
+	if save_data:
+		fig.savefig('figures/stokes_vorticity.png');
+		fig2.savefig('figures/stokes_streamlines.png');
+		fig3.savefig('figures/stokes_divergence.png');
+	else:
+		plt.show();
