@@ -155,7 +155,9 @@ if __name__ == '__main__':
 	fx = lambda x, y, t: 0.25 + 0.25*np.tanh(-15*(y - 0.5));
 	fy = lambda x, y, t: np.zeros_like(x);
 	# Boolian flag to save data
-	saveData = False;
+	saveData = True;
+	# Boolian flag whether or not to force the simulation to run
+	forceRun = False;
 	## ============================================== ##
 	## ============================================== ##
 
@@ -174,12 +176,20 @@ if __name__ == '__main__':
 	## ============================================== ##
 	## ========= Solve Navier-Stokes system ========= ##
 	## ============================================== ##
-	t_arr, omega, u, pressure, streamFunc, DIVu = navierStokesSolver(msh, sem, dt, Ndt, Re, fx, fy, saveData = saveData);
+	if forceRun:
+		t_arr, omega, u, pressure, streamFunc, DIVu = navierStokesSolver(msh, sem, dt, Ndt, Re, fx, fy, saveData = saveData);
+	else:
+		try:
+			with open('./savedData/solution_p_%i_NxM_%ix%i_Re_%0.1f_dt_%0.2e.pkl'%(p, N, M, Re, dt), 'rb') as file:
+					data = pickle.load(file);
+					print('-----------Found saved data')
+					saveData = False
+					file.close();
+			# print(data.keys())
+			t_arr, omega, u, pressure, streamFunc, DIVu = data['t_arr'], data['omega'], data['u'], data['pressure'], data['streamFunc'], data['DIVu'];
+		except FileNotFoundError:
+			t_arr, omega, u, pressure, streamFunc, DIVu = navierStokesSolver(msh, sem, dt, Ndt, Re, fx, fy, saveData = saveData);
 
-	# with open('./savedData/solution_p_%i_NxM_%ix%i_Re_%0.1f_dt_%0.2e.pkl'%(p, N, M, Re, dt), 'rb') as file:
-	# 		data = pickle.load(file);
-	# 		file.close();
-	# t_arr, omega, u, pressure, lambdas, DIVu = data['t_arr'], data['omega'], data['u'], data['pressure'], data['lambdas'], data['DIVu'];
 	## ============================================== ##
 	## ============================================== ##
 
@@ -232,7 +242,8 @@ if __name__ == '__main__':
 		return cax, cax1, cax2, text;
 
 	ani = pltani.FuncAnimation(fig, step, omega_Reconstruct_plot.shape[-1] - 1, init_func = init, interval = 30);
-	# ani.save('%s.mp4'%('./savedData/geom4_solution_anim_p_%i_NxM_%ix%i_Re_%0.1f_dt_%0.2e.pkl'%(p, N, M, Re, dt)), writer = 'ffmpeg');
+	if saveData:
+		ani.save('%s.gif'%('./figures/geom4_solution_anim_p_%i_NxM_%ix%i_Re_%0.1f_dt_%0.2e.pkl'%(p, N, M, Re, dt)), writer = 'ffmpeg');
 	plt.show();
 
 	static_timeStamps = (np.linspace(0, 1, 5)*(Ndt - 1)).astype(int);
