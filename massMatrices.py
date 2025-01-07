@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 def assemble_element_M0(psi0_i, psi0_j, w_xi, w_eta, det_F, dx_dxi, dx_deta, dy_dxi, dy_deta):
 	""" 
@@ -28,7 +27,7 @@ def assemble_element_M0(psi0_i, psi0_j, w_xi, w_eta, det_F, dx_dxi, dx_deta, dy_
 	for i in range((p+1)**2):
 		for j in range((p+1)**2):
 			M0[i, j] = np.sum(psi0_i[i, :, :]*psi0_j[j, :, :]*w*det_F)
-	
+
 	return M0
 
 def assemble_element_M1(psi1_xi_i, psi1_eta_i, psi1_xi_j, psi1_eta_j, w_xi, w_eta, det_F, dx_dxi, dx_deta, dy_dxi, dy_deta):
@@ -69,8 +68,7 @@ def assemble_element_M1(psi1_xi_i, psi1_eta_i, psi1_xi_j, psi1_eta_j, w_xi, w_et
 			M_eta_eta[i, j] = np.sum(psi1_eta_i[i, :, :]*FTF[1, 1]*psi1_eta_j[j, :, :]*w/det_F)
 	
 	M1 = np.block([[M_xi_xi, M_xi_eta], [M_eta_xi, M_eta_eta]])
-	# plt.spy(M1)
-	# plt.show()
+	
 	return M1
 
 
