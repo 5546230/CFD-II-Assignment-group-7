@@ -12,7 +12,6 @@ from src.geometryMaps import squareGeom
 from stokesFlow2D import stokesSolver
 from mpltools import annotation
 from scipy.stats import linregress
-import os
 ## ============================================== ##
 ## =================== Inputs =================== ##
 ## ============================================== ##
@@ -97,7 +96,7 @@ for i, p in enumerate(p_arr):
 ## ======================= Error plots ========================== ##
 ## ============================================================== ##
 # Save data
-save_data = True;
+save_data = False;
 
 fig0 = plt.figure();
 ax0 = fig0.add_subplot(111);
@@ -184,15 +183,13 @@ for i, p in enumerate(p_arr):
 	ax4.legend(bbox_to_anchor = (0., 1.01, 1., .102), loc = 'lower left',
 					ncol = 4, mode = 'expand', borderaxespad = 0.);
 
-os.makedirs('figures', exist_ok=True)
-
-# if save_data:
-# 	fig0.savefig('error_figures/Error_u_in_L2.png');
-# 	fig1.savefig('error_figures/Error_u_in_Hdiv.png');
-# 	fig2.savefig('error_figures/Error_omega_in_L2.png');
-# 	fig3.savefig('error_figures/Error_omega_in_Hcurl.png');
-# 	fig4.savefig('error_figures/Error_pressure_in_L2.png');
-# else:
-# 	plt.show();
+if save_data:
+	fig0.savefig('error_figures/Error_u_in_L2.png');
+	fig1.savefig('error_figures/Error_u_in_Hdiv.png');
+	fig2.savefig('error_figures/Error_omega_in_L2.png');
+	fig3.savefig('error_figures/Error_omega_in_Hcurl.png');
+	fig4.savefig('error_figures/Error_pressure_in_L2.png');
+else:
+	plt.show();
 ## ============================================================== ##
 ## ============================================================== ##
