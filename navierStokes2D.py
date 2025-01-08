@@ -148,7 +148,7 @@ if __name__ == '__main__':
 	# Number of time steps
 	Ndt = 20001;
 	# Reynolds number
-	Re = 40;
+	Re = 400;
 	# Geometry definition
 	geomMap = geomdef();
 	# Source term of PDE
