@@ -45,3 +45,15 @@ def assemble_element_E21(p):
 		]]
 	)
 	return E21
+
+
+for p in range(30):
+	E10 = assemble_element_E10(p).toarray()
+	E21 = assemble_element_E21(p).toarray()
+
+	assert E10.shape[0] == (2*p*(p + 1))  # size check
+	assert E10.shape[1] == ((p + 1)*(p + 1)) # size check
+	assert E21.shape[0] == (p*p) # size check
+	assert E21.shape[1] == (2*p*(p + 1)) # size check
+
+	assert np.sum(np.dot(E21, E10)) == 0 # Identity check
