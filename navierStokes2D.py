@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib.colors as colors
 from src.geometryMaps import geomdef
 import sys
+import os
 import matplotlib.animation as pltani
 import pickle
 import warnings
@@ -176,6 +177,8 @@ if __name__ == '__main__':
 	## ============================================== ##
 	## ========= Solve Navier-Stokes system ========= ##
 	## ============================================== ##
+	if not os.path.isdir('savedData'):
+		os.mkdir('savedData')
 	if forceRun:
 		t_arr, omega, u, pressure, streamFunc, DIVu = navierStokesSolver(msh, sem, dt, Ndt, Re, fx, fy, saveData = saveData);
 	else:
