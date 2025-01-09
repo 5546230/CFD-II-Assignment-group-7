@@ -137,11 +137,11 @@ if __name__ == '__main__':
 	## =================== Inputs =================== ##
 	## ============================================== ##
 	# Polynomial degree
-	p = 4;
+	p = 5;
 	# Number of elements in x-direction
-	N = 12;
+	N = 18;
 	# Number of elements in y-direction
-	M = 6;
+	M = 8;
 	# Number of nodes to plot in
 	pRefined = p + 2;
 	# Time step size

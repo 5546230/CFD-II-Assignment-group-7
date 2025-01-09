@@ -155,11 +155,11 @@ if __name__ == '__main__':
 
 	fig3 = plt.figure();
 	ax3 = fig3.add_subplot(111);
-	cax3 = ax3.pcolormesh(msh.xPlot, msh.yPlot, DIVu_Reconstruct, cmap = 'viridis');
+	cax3 = ax3.pcolormesh(msh.xPlot, msh.yPlot, DIVu_Reconstruct, norm=colors.SymLogNorm(1e-14), cmap = 'viridis');
 	ax3.set_aspect('equal');
 	ax3.set_xlabel(r'$x$');
 	ax3.set_ylabel(r'$y$');
-	fig3.colorbar(cax3, orientation = 'horizontal');
+	fig3.colorbar(cax3, orientation = 'horizontal', extend='both');
 	fig3.tight_layout();
 	
 	if save_data:
