@@ -25,7 +25,7 @@ geomMap = squareGeom();
 ## ++++++++++++++++++++++ in the lines below ++++++++++++++++++++ ##
 ## ============================================================== ##
 fx = lambda x, y: -8*np.pi**2*np.cos(2*np.pi*x)*np.sin(2*np.pi*y)-2*np.pi*np.cos(2*np.pi*x)*np.cos(2*np.pi*y)# Add x−component of the forcing term as a function of x and y
-fy = lambda x, y: -4*np.pi**2*np.sin(2*np.pi*x)*(1 - np.cos(2*np.pi*y)) + 4*np.pi**2*np.sin(2*np.pi*x)*np.cos(2*np.pi*y) + 2*np.pi*2*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)# Add y−component of the forcing term as a function of x and y
+fy = lambda x, y: -4*np.pi**2*np.sin(2*np.pi*x)*(1 - np.cos(2*np.pi*y)) + 4*np.pi**2*np.sin(2*np.pi*x)*np.cos(2*np.pi*y) + 2*np.pi*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)# Add y−component of the forcing term as a function of x and y
 ## ============================================================== ## # (Remove later); -4*np.pi**2*np.sin(2*np.pi*x) + 8*np.pi**2*np.sin(2*np.pi*x)*np.cos(2*np.pi*y) + 2*np.pi*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
 ## ============================================================== ##
 
@@ -96,7 +96,7 @@ for i, p in enumerate(p_arr):
 ## ======================= Error plots ========================== ##
 ## ============================================================== ##
 # Save data
-save_data = False;
+save_data = True;
 
 fig0 = plt.figure();
 ax0 = fig0.add_subplot(111);
@@ -123,7 +123,7 @@ for i, p in enumerate(p_arr):
 	ax0.grid(visible = True, which = 'minor', color = '#999999', linestyle = '-', alpha = 0.2);
 	ax0.tick_params(axis = 'both', which = 'minor', labelsize = 10);
 	
-	ax0.set_xlabel(r'$\frac{1}{\sqrt{h_x h_y}}$');
+	ax0.set_xlabel(r'$\dfrac{1}{\sqrt{h_x h_y}}$');
 	ax0.set_ylabel(r'$|| u - u_{ex} ||_{L^2}$');
 	ax0.legend(bbox_to_anchor = (0., 1.01, 1., .102), loc = 'lower left',
 					ncol = 4, mode = 'expand', borderaxespad = 0.);
@@ -137,8 +137,8 @@ for i, p in enumerate(p_arr):
 	ax1.grid(visible = True, which = 'minor', color = '#999999', linestyle = '-', alpha = 0.2);
 	ax1.tick_params(axis = 'both', which = 'minor', labelsize = 10);
 	
-	ax1.set_xlabel(r'$\frac{1}{\sqrt{h_x h_y}}$');
-	ax1.set_ylabel(r'$\left(|| u - u_{ex} ||_{L^2}^2 + || \nabla \cdot u - \nabla \cdot u_{ex} ||_{L^2}^2 \right)^{\frac{1}{2}}$');
+	ax1.set_xlabel(r'$\dfrac{1}{\sqrt{h_x h_y}}$');
+	ax1.set_ylabel(r'$\left(|| u - u_{ex} ||_{L^2}^2 + || \nabla \cdot u - \nabla \cdot u_{ex} ||_{L^2}^2 \right)^{\dfrac{1}{2}}$');
 	ax1.legend(bbox_to_anchor = (0., 1.01, 1., .102), loc = 'lower left',
 					ncol = 4, mode = 'expand', borderaxespad = 0.);
 	
@@ -151,7 +151,7 @@ for i, p in enumerate(p_arr):
 	ax2.grid(visible = True, which = 'minor', color = '#999999', linestyle = '-', alpha = 0.2);
 	ax2.tick_params(axis = 'both', which = 'minor', labelsize = 10);
 	
-	ax2.set_xlabel(r'$\frac{1}{\sqrt{h_x h_y}}$');
+	ax2.set_xlabel(r'$\dfrac{1}{\sqrt{h_x h_y}}$');
 	ax2.set_ylabel(r'$|| \bar{\omega} - \omega_{ex} ||_{L^2}$');
 	ax2.legend(bbox_to_anchor = (0., 1.01, 1., .102), loc = 'lower left',
 					ncol = 4, mode = 'expand', borderaxespad = 0.);
@@ -165,8 +165,8 @@ for i, p in enumerate(p_arr):
 	ax3.grid(visible = True, which = 'minor', color = '#999999', linestyle = '-', alpha = 0.2);
 	ax3.tick_params(axis = 'both', which = 'minor', labelsize = 10);
 	
-	ax3.set_xlabel(r'$\frac{1}{\sqrt{h_x h_y}}$');
-	ax3.set_ylabel(r'$\left(|| \bar{\omega} - \omega_{ex} ||_{L^2}^2 + || \nabla \times \bar{\omega} - \nabla \times \omega_{ex} ||_{L^2}^2\right)^{\frac{1}{2}}$');
+	ax3.set_xlabel(r'$\dfrac{1}{\sqrt{h_x h_y}}$');
+	ax3.set_ylabel(r'$\left(|| \bar{\omega} - \omega_{ex} ||_{L^2}^2 + || \nabla \times \bar{\omega} - \nabla \times \omega_{ex} ||_{L^2}^2\right)^{\dfrac{1}{2}}$');
 	ax3.legend(bbox_to_anchor = (0., 1.01, 1., .102), loc = 'lower left',
 					ncol = 4, mode = 'expand', borderaxespad = 0.);
 	# Error pressure in L2
@@ -178,17 +178,23 @@ for i, p in enumerate(p_arr):
 	ax4.grid(visible = True, which = 'minor', color = '#999999', linestyle = '-', alpha = 0.2);
 	ax4.tick_params(axis = 'both', which = 'minor', labelsize = 10);
 	
-	ax4.set_xlabel(r'$\frac{1}{\sqrt{h_x h_y}}$');
+	ax4.set_xlabel(r'$\dfrac{1}{\sqrt{h_x h_y}}$');
 	ax4.set_ylabel(r'$|| \bar{p} - p_{ex} ||_{L^2}$');
 	ax4.legend(bbox_to_anchor = (0., 1.01, 1., .102), loc = 'lower left',
 					ncol = 4, mode = 'expand', borderaxespad = 0.);
+	
+	fig0.tight_layout()
+	fig1.tight_layout()
+	fig2.tight_layout()
+	fig3.tight_layout()
+	fig4.tight_layout()
 
 if save_data:
-	fig0.savefig('error_figures/Error_u_in_L2.png');
-	fig1.savefig('error_figures/Error_u_in_Hdiv.png');
-	fig2.savefig('error_figures/Error_omega_in_L2.png');
-	fig3.savefig('error_figures/Error_omega_in_Hcurl.png');
-	fig4.savefig('error_figures/Error_pressure_in_L2.png');
+	fig0.savefig('error_figures/Error_u_in_L2.pdf');
+	fig1.savefig('error_figures/Error_u_in_Hdiv.pdf');
+	fig2.savefig('error_figures/Error_omega_in_L2.pdf');
+	fig3.savefig('error_figures/Error_omega_in_Hcurl.pdf');
+	fig4.savefig('error_figures/Error_pressure_in_L2.pdf');
 else:
 	plt.show();
 ## ============================================================== ##
