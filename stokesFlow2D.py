@@ -69,9 +69,9 @@ if __name__ == '__main__':
 	# Polynomial degree
 	p = 4;
 	# Number of elements in x-direction
-	N = 12;
+	N = 16;
 	# Number of elements in y-direction
-	M = 6;
+	M = 8;
 	# Number of nodes to plot in
 	pRefined = p + 2;
 	# Geometry definition
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 	fx = lambda x, y: -(0.25 + 0.25*np.tanh(-15*(y - 0.5)));
 	fy = lambda x, y: np.zeros_like(x);
 	# Save data
-	save_data = False;
+	save_data = True;
 	## ============================================== ##
 	## ============================================== ##
 
@@ -145,7 +145,7 @@ if __name__ == '__main__':
 	uMag = np.sqrt(u_Reconstruct**2 + v_Reconstruct**2);
 	fig2 = plt.figure();
 	ax2 = fig2.add_subplot(111);
-	cax2 = ax2.contourf(msh.xPlot, msh.yPlot, uMag, cmap = 'viridis', extend = 'both', levels = np.linspace(0, 1, 100));
+	cax2 = ax2.contourf(msh.xPlot, msh.yPlot, uMag, cmap = 'viridis', extend = 'max', levels = np.linspace(0, 1, 21));
 	ax2.contour(msh.xPlot, msh.yPlot, streamFunc_Reconstruct, levels = streamfuncIsoValues, colors = 'black', linestyles = 'solid', );
 	ax2.set_aspect('equal');
 	ax2.set_xlabel(r'$x$');
@@ -159,12 +159,34 @@ if __name__ == '__main__':
 	ax3.set_aspect('equal');
 	ax3.set_xlabel(r'$x$');
 	ax3.set_ylabel(r'$y$');
-	fig3.colorbar(cax3, orientation = 'horizontal', extend='both');
+	fig3.colorbar(cax3, orientation = 'horizontal');
 	fig3.tight_layout();
+
+	fig4 = plt.figure()
+	ax4 = fig4.add_subplot(111)
+	cax4 = ax4.contourf(msh.xPlot, msh.yPlot, p_Reconstruct, cmap='viridis', levels = 21, extend='both');
+	ax4.set_aspect('equal');
+	ax4.set_xlabel(r'$x$');
+	ax4.set_ylabel(r'$y$');
+	fig4.colorbar(cax4, orientation = 'horizontal');
+	fig4.tight_layout();
+
+	fig5, ax5 = plt.subplots(1, 3, figsize = (12, 4), sharey = True)
+	ax5[0].set_ylabel(r'$u_x$')
+	for x, axs in zip([0.5, 1.0, 1.5], ax5):
+		ndx = np.isclose(msh.xPlot, x)
+		axs.plot(msh.yPlot[ndx], u_Reconstruct[ndx])
+		axs.set_xlabel(r'$y$')
+		axs.set_title(f'x = {x}')
+		# axs.set_aspect('equal')
+		axs.grid()
+	fig5.tight_layout()	
 	
 	if save_data:
 		fig.savefig('figures/stokes_vorticity.png');
 		fig2.savefig('figures/stokes_streamlines.png');
 		fig3.savefig('figures/stokes_divergence.png');
+		fig4.savefig('figures/stokes_pressure.png')
+		fig5.savefig('figures/stokes_profile.pdf')
 	else:
 		plt.show();

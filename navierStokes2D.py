@@ -137,9 +137,9 @@ if __name__ == '__main__':
 	## =================== Inputs =================== ##
 	## ============================================== ##
 	# Polynomial degree
-	p = 5;
+	p = 4;
 	# Number of elements in x-direction
-	N = 18;
+	N = 16;
 	# Number of elements in y-direction
 	M = 8;
 	# Number of nodes to plot in
@@ -149,7 +149,7 @@ if __name__ == '__main__':
 	# Number of time steps
 	Ndt = 20001;
 	# Reynolds number
-	Re = 400;
+	Re = 40;
 	# Geometry definition
 	geomMap = geomdef();
 	# Source term of PDE
@@ -196,6 +196,8 @@ if __name__ == '__main__':
 	## ============================================== ##
 	## ============================================== ##
 
+	print(np.abs(u[:, -1] - u[:, -2]).max()/dt)
+
 	## ============================================== ##
 	## ============ Post process solution =========== ##
 	## ============================================== ##
@@ -205,16 +207,16 @@ if __name__ == '__main__':
 	psi2_plot = sem.k_formBasis(2, msh.xi_hiDOP, msh.eta_hiDOP);
 
 	# Compute integral of vorticity over the domain
-	integral_omega = msh.W_hiDOP@psi0_plot@omega[:, 1:];
+	integral_omega = msh.W@omega[:, 1:];
 
 	# Reconstruct solution (Note, this reconstruction can be very memory intensive for fine meshes with many time steps.
 	# To save cost, you can slice the array so as to reconstruct only a select few time steps instead of all the time steps)
 	omega_Reconstruct = msh.gridit((psi0_plot@omega).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
 	streamFunc_Reconstruct = msh.gridit((psi0_plot@streamFunc).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
-	# DIVu_Reconstruct = msh.gridit((psi2_plot@DIVu).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
-	# p_Reconstruct = msh.gridit((psi2_plot@pressure).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
-	# u_Reconstruct = msh.gridit((psi1x_plot@u).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
-	# v_Reconstruct = msh.gridit((psi1y_plot@u).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
+	DIVu_Reconstruct = msh.gridit((psi2_plot@DIVu).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
+	p_Reconstruct = msh.gridit((psi2_plot@pressure).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
+	u_Reconstruct = msh.gridit((psi1x_plot@u).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
+	v_Reconstruct = msh.gridit((psi1y_plot@u).reshape(-1, msh.nPlot_x, msh.nPlot_y, Ndt));
 
 	msh.plotMesh();
 
@@ -247,21 +249,100 @@ if __name__ == '__main__':
 	ani = pltani.FuncAnimation(fig, step, omega_Reconstruct_plot.shape[-1] - 1, init_func = init, interval = 30);
 	if saveData:
 		ani.save('%s.gif'%('./figures/geom4_solution_anim_p_%i_NxM_%ix%i_Re_%0.1f_dt_%0.2e.pkl'%(p, N, M, Re, dt)), writer = 'ffmpeg');
-	plt.show();
+	# plt.show();
 
 	static_timeStamps = (np.linspace(0, 1, 5)*(Ndt - 1)).astype(int);
+	static_timeStamps = static_timeStamps[-2:]
+	
 	for i in static_timeStamps[1:]:
 		# Plot of vorticity
-		fig = plt.figure('t = %0.1f'%t_arr[i]);
-		ax = fig.add_subplot(111);
-		ax.set_xlabel(r'$x$');
-		ax.set_ylabel(r'$y$');
-		ax.set_aspect('equal');
-		cax = ax.contourf(msh.xPlot, msh.yPlot, omega_Reconstruct[..., i], levels = levels, cmap = plt.cm.twilight_shifted, extend = 'both');
-		fig.colorbar(cax, orientation = 'horizontal');
+		fig0 = plt.figure('t = %0.1f'%t_arr[i]);
+		ax0 = fig0.add_subplot(111);
+		ax0.set_xlabel(r'$x$');
+		ax0.set_ylabel(r'$y$');
+		ax0.set_aspect('equal');
+		cax0 = ax0.contourf(msh.xPlot, msh.yPlot, omega_Reconstruct[..., i], levels = levels, cmap = 'viridis', extend = 'both');
+		fig0.colorbar(cax0, orientation = 'horizontal');
+		fig0.tight_layout()
+
+		fig1 = plt.figure();
+		ax1 = fig1.add_subplot(111)
+		ax1.set_xlabel(r'$x$');
+		ax1.set_ylabel(r'$y$');
+		ax1.set_aspect('equal');
+		cax1 = ax1.pcolormesh(msh.xPlot, msh.yPlot, DIVu_Reconstruct[..., i], norm=colors.SymLogNorm(1e-14), cmap = 'viridis');
+		fig1.colorbar(cax1, orientation = 'horizontal')
+		fig1.tight_layout()
+
+		y = np.linspace(0, 1, 20, endpoint = True);
+		# find the streamfunc values at (0, y)
+		streamfuncIsoValues = np.zeros_like(y);
+		for j in range(len(y)):
+			idx = np.argmin(np.abs(msh.yPlot[:, 0] - y[j]));
+			streamfuncIsoValues[j] = streamFunc_Reconstruct[..., i][idx, 0];
+		uMag = np.sqrt(u_Reconstruct**2 + v_Reconstruct**2);
+		fig2 = plt.figure();
+		ax2 = fig2.add_subplot(111);
+		lev = np.linspace(0, uMag.max(), 20)
+		cax2 = ax2.contourf(msh.xPlot, msh.yPlot, uMag[..., i], cmap = 'viridis', extend = 'max', levels = lev);
+		ax2.contour(msh.xPlot, msh.yPlot, streamFunc_Reconstruct[..., i], levels = sorted(streamfuncIsoValues), colors = 'black', linestyles = 'solid', );
+		ax2.set_aspect('equal');
+		ax2.set_xlabel(r'$x$');
+		ax2.set_ylabel(r'$y$');
+		fig2.colorbar(cax2, orientation = 'horizontal');
+		fig2.tight_layout();
+
+		fig3, ax3 = plt.subplots(1, 3, figsize = (12, 4), sharey = True)
+		ax3[0].set_ylabel(r'$u_x$')
+		for x, axs in zip([0.5, 1.0, 1.5], ax3):
+			ndx = np.isclose(msh.xPlot, x)
+			axs.plot(msh.yPlot[ndx], u_Reconstruct[..., i][ndx])
+			axs.set_xlabel(r'$y$')
+			axs.set_title(f'x = {x}')
+			# axs.set_aspect('equal')
+			axs.grid()
+		fig3.tight_layout()	
+		# ax3.plot(x_locs, interp, 'o', label = 'Numerical')
+
+		fig4 = plt.figure()
+		ax4 = fig4.add_subplot(111)
+		cax4 = ax4.contourf(msh.xPlot, msh.yPlot, p_Reconstruct[..., i], cmap='viridis', levels = 20, extend='both');
+		ax4.set_aspect('equal');
+		ax4.set_xlabel(r'$x$');
+		ax4.set_ylabel(r'$y$');
+		fig4.colorbar(cax4, orientation = 'horizontal');
+		fig4.tight_layout();
+
+		fig5 = plt.figure()
+		ax5 = fig5.add_subplot(111)
+		ax5.plot(t_arr[2:], (integral_omega + 2))
+		ax5.set_xlabel(r'$t$')
+		ax5.set_ylabel(r'$\int \omega dA -\int \omega_{exact} dA $')
+		ax5.grid()
+		# log scale
+		# ax5.set_yscale('symlog')
+		# add ticks for the log scale
+		# ax5.yaxis.set_minor_locator(plt.MultipleLocator(1))
+		# ax5.yaxis.set_minor_formatter(plt.FuncFormatter(lambda x, _: f'{x:.0f}' if x > 0 else ''))
+		# ax5.yaxis.set_major_locator(plt.MultipleLocator(.1))
+
+
+		fig5.tight_layout()
+
+
+
+		if i == 20000:
+			fig0.savefig(f'figures/navier_stokes_vorticity_Re{Re}_dt{dt}_t{i}.png')
+			fig1.savefig(f'figures/navier_stokes_divergence_Re{Re}_dt{dt}_t{i}.png')
+			fig2.savefig(f'figures/navier_stokes_streamlines_Re{Re}_dt{dt}_t{i}.png')
+			fig3.savefig(f'figures/navier_stokes_profile_Re{Re}_dt{dt}_t{i}.pdf')
+			fig4.savefig(f'figures/navier_stokes_pressure_Re{Re}_dt{dt}_t{i}.png')
+			fig5.savefig(f'figures/navier_stokes_integral_Re{Re}_dt{dt}.pdf')
+		
 
 		# Now implement your own plotting routine for the streamlines, the divergence plots, etc
-	plt.show();
+
+	# plt.show();
 	
 	## ============================================== ##
 	## ============================================== ##
