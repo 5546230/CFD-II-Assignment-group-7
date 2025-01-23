@@ -26,7 +26,7 @@ geomMap = squareGeom();
 ## ============================================================== ##
 fx = lambda x, y: -8*np.pi**2*np.cos(2*np.pi*x)*np.sin(2*np.pi*y)-2*np.pi*np.cos(2*np.pi*x)*np.cos(2*np.pi*y)# Add x−component of the forcing term as a function of x and y
 fy = lambda x, y: -4*np.pi**2*np.sin(2*np.pi*x)*(1 - np.cos(2*np.pi*y)) + 4*np.pi**2*np.sin(2*np.pi*x)*np.cos(2*np.pi*y) + 2*np.pi*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)# Add y−component of the forcing term as a function of x and y
-## ============================================================== ## # (Remove later); -4*np.pi**2*np.sin(2*np.pi*x) + 8*np.pi**2*np.sin(2*np.pi*x)*np.cos(2*np.pi*y) + 2*np.pi*np.sin(2*np.pi*x)*np.sin(2*np.pi*y)
+## ============================================================== ##
 ## ============================================================== ##
 
 ## ============================================================== ##
