@@ -20,13 +20,10 @@ def assemble_element_M0(psi0_i, psi0_j, w_xi, w_eta, det_F, dx_dxi, dx_deta, dy_
 	## ++++++++++++++ Implement the zero-form mass matrix +++++++++++ ##
 	## ++++++++++++++++++++++++ assembly below ++++++++++++++++++++++ ##
 	## ============================================================== ##
-	p = psi0_i.shape[1] - 1
-	M0 = np.zeros(((p+1)**2,(p+1)**2))
 	w = np.outer(w_xi, w_eta)
 
-	for i in range((p+1)**2):
-		for j in range((p+1)**2):
-			M0[i, j] = np.sum(psi0_i[i, :, :]*psi0_j[j, :, :]*w*det_F)
+	# vectorized version
+	M0 = np.einsum('ikl,kl,jkl->ij', psi0_i, w*det_F, psi0_j, optimize=True)	
 
 	return M0
 
@@ -49,24 +46,18 @@ def assemble_element_M1(psi1_xi_i, psi1_eta_i, psi1_xi_j, psi1_eta_j, w_xi, w_et
 	## ++++++++++++++ Implement the one-form mass matrix ++++++++++++ ##
 	## ++++++++++++++++++++++++ assembly below ++++++++++++++++++++++ ##
 	## ============================================================== ##
-	p = psi1_xi_i.shape[1] - 1
-	M_xi_xi = np.zeros((p*(p + 1), p*(p + 1)))
-	M_xi_eta = np.zeros((p*(p + 1), p*(p + 1)))
-	M_eta_xi = np.zeros((p*(p + 1), p*(p + 1)))
-	M_eta_eta = np.zeros((p*(p + 1), p*(p + 1)))
 	w = np.outer(w_xi, w_eta)
 
 	F = np.array([[dx_dxi, dx_deta], [dy_dxi, dy_deta]])
 
 	FTF = np.einsum('ij...,ik...->kj...', F, F) # F^T*F 
 
-	for i in range(p*(p + 1)):
-		for j in range(p*(p + 1)):
-			M_xi_xi[i, j] = np.sum(psi1_xi_i[i, :, :]*FTF[0, 0]*psi1_xi_j[j, :, :]*w/det_F)
-			M_xi_eta[i, j] = np.sum(psi1_xi_i[i, :, :]*FTF[0, 1]*psi1_eta_j[j, :, :]*w/det_F)
-			M_eta_xi[i, j] = np.sum(psi1_eta_i[i, :, :]*FTF[1, 0]*psi1_xi_j[j, :, :]*w/det_F)
-			M_eta_eta[i, j] = np.sum(psi1_eta_i[i, :, :]*FTF[1, 1]*psi1_eta_j[j, :, :]*w/det_F)
-	
+	# vectorized version
+	M_xi_xi = np.einsum('ikl,kl,jkl->ij', psi1_xi_i, FTF[0, 0] * w / det_F, psi1_xi_j, optimize=True)
+	M_xi_eta = np.einsum('ikl,kl,jkl->ij', psi1_xi_i, FTF[0, 1] * w / det_F, psi1_eta_j, optimize=True)
+	M_eta_xi = np.einsum('ikl,kl,jkl->ij', psi1_eta_i, FTF[1, 0] * w / det_F, psi1_xi_j, optimize=True)
+	M_eta_eta = np.einsum('ikl,kl,jkl->ij', psi1_eta_i, FTF[1, 1] * w / det_F, psi1_eta_j, optimize=True)
+
 	M1 = np.block([[M_xi_xi, M_xi_eta], [M_eta_xi, M_eta_eta]])
 	
 	return M1
@@ -91,12 +82,8 @@ def assemble_element_M2(psi2_i, psi2_j, w_xi, w_eta, det_F, dx_dxi, dx_deta, dy_
 	## ++++++++++++++ Implement the two-form mass matrix ++++++++++++ ##
 	## ++++++++++++++++++++++++ assembly below ++++++++++++++++++++++ ##
 	## ============================================================== ##
-	p = psi2_i.shape[1] - 1
-	M2 = np.zeros((p*p, p*p))
 	w = np.outer(w_xi, w_eta)
 
-	for i in range(p*p):
-		for j in range(p*p):
-			M2[i, j] = np.sum(psi2_i[i, :, :]*psi2_j[j, :, :]*w/det_F)
+	M2 = np.einsum('ikl,kl,jkl->ij', psi2_i, w/det_F, psi2_j, optimize=True)
 	
 	return M2
